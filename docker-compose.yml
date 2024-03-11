@@ -11,6 +11,7 @@ services:
             - odoo_db_data:/var/lib/postgresql/data/pgdata
         ports:
             - "5433:5432"
+        tty: true
 
     odoo:
         image: odoo:17
@@ -27,6 +28,7 @@ services:
             - PORT=5432
             - USER=odoo
             - PASSWORD=odoo
+        tty: true
 volumes:
     odoo_data:
     odoo_db_data:
