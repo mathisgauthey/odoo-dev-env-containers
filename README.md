@@ -135,3 +135,13 @@ Based on the [Dockerhub instructions](https://hub.docker.com/_/odoo/), we need t
 This is because the database need to be initialiwed when Odoo first start. That's why we gave it a different name in the `odoo.conf` file. Hence when Odoo first starts, it will create the database `odoo-db` and initialise it.
 
 If we'd used `POSTGRES_DB=odoo-db` in the `docker-compose.yml` file, the database would have been created with the name `odoo-db` and Odoo would have failed to start because it would have been unable to find the database `postgres`. It would have asked us to force the database initialisation using `--init base` flag on our first start-up.
+
+## How to access Odoo source code from the container
+
+You can access it by connecting to your container using the following command :
+
+```bash
+docker exec -it CONTAINER_NAME bash
+```
+
+And then you need to go to `/usr/lib/python3/dist-packages/odoo` to access the source code.
