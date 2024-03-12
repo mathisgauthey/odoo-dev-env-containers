@@ -1,6 +1,7 @@
 version: "3.1"
 services:
     db:
+        container_name: odoo-db
         image: postgres:16
         environment:
             - POSTGRES_DB=postgres
@@ -8,19 +9,22 @@ services:
             - POSTGRES_PASSWORD=odoo
             - PGDATA=/var/lib/postgresql/data/pgdata
         volumes:
-            - odoo_db_data:/var/lib/postgresql/data/pgdata
+            - odoo-db-data:/var/lib/postgresql/data/pgdata
         ports:
-            - "5433:5432"
+            - "5432:5432"
         tty: true
 
     odoo:
-        image: odoo:17
+        container_name: odoo-web
+        build: .
         depends_on:
             - db
         ports:
             - "8069:8069"
+            - "8888:8888"
         volumes:
-            - odoo_data:/var/lib/odoo
+            - odoo-web-data:/var/lib/odoo
+            # - ./src/odoo:/usr/lib/python3/dist-packages/odoo
             - ./config:/etc/odoo
             - ./addons:/mnt/extra-addons
         environment:
@@ -28,7 +32,17 @@ services:
             - PORT=5432
             - USER=odoo
             - PASSWORD=odoo
+            - PYTHONUNBUFFERED=1
+            - PIP_AUTO_INSTALL=1
+            - DEBUGPY_ENABLE=1
+            - PUID = 1000
+            - PGID = 1000
+        entrypoint: /usr/bin/python3 -m debugpy --listen 0.0.0.0:8888 /usr/bin/odoo -c /etc/odoo/odoo.conf
         tty: true
+
 volumes:
-    odoo_data:
-    odoo_db_data:
+    odoo-web-data:
+    odoo-db-data:
+networks:
+    default:
+        name: odoo-network

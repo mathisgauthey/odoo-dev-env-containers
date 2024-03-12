@@ -1,0 +1,3 @@
+debugpy
+pydevd
+pydevd-odoo
