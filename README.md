@@ -2,7 +2,7 @@
 
 This repo is meant to **simplify the dev environment for odoo development**.
 
-The only prerequisite is to have [Docker](https://www.docker.com/) installed on your machine (or [Rancher Desktop](https://rancherdesktop.io/)), and Git to clone this repo.
+The only prerequisite is to have [Docker](https://www.docker.com/) installed on your machine (or [Rancher Desktop](https://rancherdesktop.io/)), and Git to clone this repo. I'd still suggest to clone this repo inside WSL as Linux will always feel better than Windows for development, and both Windows Docker and Rancher desktop supports linking to WSL2.
 
 Using Docker allows us to :
 
@@ -10,16 +10,25 @@ Using Docker allows us to :
 2. Have a consistent environment across all developers.
 3. Have a similar environment for testing and production.
 
-> No more manual set up of the database, no more manual set up of a venv, no more manual set up of the odoo configuration and launch arguments, and no more struggling with unmet dependencies on different operating systems.
+> No more manual set up of the database manipulating `pg_hba.conf`, no more manual set up of a python venv, no more manual set up of the odoo configuration and launch arguments, and no more struggling with unmet dependencies on different operating systems.
 
 ## What Directory Structure Should I Use to Develop Odoo Addons ?
 
 Based on [odoo docs](https://www.odoo.com/documentation/17.0/developer/tutorials/getting_started/01_architecture.html#module-structure), the following directory structure should be applied when developping odoo addons:
 
 ```txt
-REPO_NAME/
+.
+└── REPO_NAME/
     ├── .git/
     ├── MODULE_NAME/
+    │   ├── data/
+    │   ├── models/
+    │   ├── controllers/
+    │   ├── views/
+    │   ├── static/
+    │   ├── wizard/
+    │   ├── report/
+    │   ├── tests/
     │   ├── __init__.py
     │   ├── __manifest__.py
     │   └── ... # Other module files and folders (Detailled below)
@@ -29,11 +38,9 @@ REPO_NAME/
     └── requirements.txt
 ```
 
-Odoo.sh is handling `requirements.txt` files in [the parent folder](https://www.odoo.com/documentation/17.0/administration/odoo_sh/advanced/containers.html#overview) of the modules, hence the file structure above.
+Odoo.sh is handling `requirements.txt` files in [the parent folder of the module](https://www.odoo.com/documentation/17.0/administration/odoo_sh/advanced/containers.html#overview). We're not using Odoo.sh, but we could still use the same structure to keep things consistent.
 
-> The requirements.txt files of submodules are taken into account as well. The platform looks for requirements.txt files in each folder containing Odoo modules: **Not in the module folder itself, but in their parent folder.**
-
-If you don't use Odoo.sh, you might need to use a bash script that looks for `requirements.txt` files and install the dependencies.
+If you don't use Odoo.sh, you might need to use a bash script that looks for `requirements.txt` files and install the required dependencies.
 
 You can find informations about [coding guidelines in details here](https://www.odoo.com/documentation/17.0/contributing/development/coding_guidelines.html).
 
@@ -71,11 +78,11 @@ You can see `PGDATA=/var/lib/postgresql/data/pgdata` in the `docker-compose.yml`
 >
 > This optional variable can be used to define another location - like a subdirectory - for the database files. The default is /var/lib/postgresql/data. If the data volume you're using is a filesystem mountpoint (like with GCE persistent disks), or remote folder that cannot be chowned to the postgres user (like some NFS mounts), or contains folders/files (e.g. lost+found), Postgres initdb requires a subdirectory to be created within the mountpoint to contain the data.
 
-Note that we used port `5433` for the host and `5432` for the container. This is because we want to avoid conflicts with other PostgreSQL instances that might be running on the host, an existing postgreSQL installation on WSL for example.
+Note that we used port `5432` for the host and for the container. It might lead to conflict if you have another PostgreSQL instance running on your host. You can change the host port to `5433` if this is the case and you want to access your database in your IDE seemlessly.
 
 ## Odoo Configuration
 
-We need to specify the database container `db`, the port (`5432` by default with PosgreSQL), the database user and password in the `docker-compose.yml` file.
+We need to specify the database container `db`, the database container port (`5432` by default with PosgreSQL), the database user and password in the `docker-compose.yml` file.
 
 ```yml
 environment:
@@ -99,7 +106,9 @@ Note that some arguments are [named differently](https://www.odoo.com/documentat
 - `--addons-path` becomes `addons_path` in `odoo.conf`
 - `--data-dir` becomes `data_dir` in `odoo.conf`
 
-## Docker Volumes
+As we're using Docker here, we're using the `odoo.conf` file as it is more convenient.
+
+## Docker Volumes and networks
 
 We use Docker volumes to persist the database data and the Odoo addons.
 
@@ -114,6 +123,8 @@ Should you want to start fresh, you need to :
 1. Stop the containers : `docker-compose down`
 2. Remove the containers : `docker-compose rm`
 3. Remove the volumes : `docker volume rm VOLUME_NAMES`
+
+We also use a network to link the Odoo and the database containers.
 
 ## Some Notes on the Odoo and Database Configuration
 
@@ -145,3 +156,11 @@ docker exec -it CONTAINER_NAME bash
 ```
 
 And then you need to go to `/usr/lib/python3/dist-packages/odoo` to access the source code.
+
+## How to debug
+
+Using VSCODE, you can simply launch your containers using `docker compose up` and then press F5 to attach to it using **debugpy**. If you put some breakpoints inside files of the `addons` folder, you should be able to debug your code.
+
+There is no current way to debug the Odoo source code.
+
+You can probably find a similar setup on Jetbrains IDEs.
