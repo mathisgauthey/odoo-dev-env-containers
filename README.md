@@ -157,9 +157,15 @@ docker exec -it CONTAINER_NAME bash
 
 And then you need to go to `/usr/lib/python3/dist-packages/odoo` to access the source code.
 
-## How to debug
+## How to debug 
 
 Using VSCODE, you can simply launch your containers using `docker compose up` and then press F5 to attach to it using **debugpy**. If you put some breakpoints inside files of the `addons` folder, you should be able to debug your code.
+
+If you want more informations about this setup, I'd recommend [Khaled Said](https://dev.to/kerbrose/how-to-remote-debugging-odoo-docker-images-python-based-framework-4o2h) or [kerbrose](https://stackoverflow.com/a/63758922/18775070) posts about it.
+
+The following picture comes from their writtings :
+
+![cQ9AR](https://github.com/mathisgauthey/odoo-dev-env-containers/assets/46576952/92049812-2188-4558-b7f1-9fb93c440549)
 
 There is no current way to debug the Odoo source code.
 
