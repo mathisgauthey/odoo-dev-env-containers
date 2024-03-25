@@ -37,7 +37,7 @@ services:
             - DEBUGPY_ENABLE=1
             - PUID = 1000
             - PGID = 1000
-        entrypoint: /usr/bin/python3 -m debugpy --listen 0.0.0.0:8888 /usr/bin/odoo -c /etc/odoo/odoo.conf
+        command: /usr/bin/python3 -m debugpy --listen 0.0.0.0:8888 /usr/bin/odoo -c /etc/odoo/odoo.conf
         tty: true
 
 volumes:
