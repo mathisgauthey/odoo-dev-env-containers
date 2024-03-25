@@ -13,11 +13,11 @@
                 {
                     "localRoot": "${workspaceFolder}/addons",
                     "remoteRoot": "/mnt/extra-addons",
-                },
-                {
-                    "localRoot": "${workspaceFolder}/src/odoo",
-                    "remoteRoot": "/usr/lib/python3/dist-packages/odoo",
                 }
+                // {
+                //     "localRoot": "${workspaceFolder}/src/odoo",
+                //     "remoteRoot": "/usr/lib/python3/dist-packages/odoo",
+                // }
             ],
             "logToFile": true,
             "justMyCode": false,
