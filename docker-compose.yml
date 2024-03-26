@@ -24,7 +24,6 @@ services:
             - "8888:8888"
         volumes:
             - odoo-web-data:/var/lib/odoo
-            # - ./src/odoo:/usr/lib/python3/dist-packages/odoo
             - ./config:/etc/odoo
             - ./addons:/mnt/extra-addons
         environment:
